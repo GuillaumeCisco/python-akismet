@@ -1,4 +1,4 @@
-# Version 0.2.0
+# Version 0.2.2
 # 2009/06/18
 
 # Copyright Michael Foord 2005-2009
@@ -26,10 +26,10 @@ value.
 
 The default is : ::
 
-    Python Interface by Fuzzyman | akismet.py/0.2.0
+    Python Interface by Fuzzyman | akismet.py/0.2.2
 
 Whatever you pass in, will replace the *Python Interface by Fuzzyman* part.
-**0.2.0** will change with the version of this interface.
+**0.2.2** will change with the version of this interface.
 
 Usage example::
     
@@ -54,23 +54,18 @@ Usage example::
             print 'This comment is ham.'
 """
 
-
-import os, sys
+import os
 from urllib import urlencode
 
-import socket
-if hasattr(socket, 'setdefaulttimeout'):
-    # Set the default timeout on sockets to 5 seconds
-    socket.setdefaulttimeout(5)
 
-__version__ = '0.2.1'
+__version__ = '0.2.2'
 
 __all__ = (
     '__version__',
     'Akismet',
     'AkismetError',
     'APIKeyError',
-    )
+)
 
 __author__ = 'Michael Foord <fuzzyman AT voidspace DOT org DOT uk>'
 
@@ -92,7 +87,7 @@ if urllib2 is None:
         req = urlfetch.fetch(url=url, payload=data, method=urlfetch.POST, headers=headers)
         if req.status_code == 200:
             return req.content
-        raise Exception('Could not fetch Akismet URL: %s Response code: %s' % 
+        raise Exception('Could not fetch Akismet URL: %s Response code: %s' %
                         (url, req.status_code))
 else:
     def _fetch_url(url, data, headers):
@@ -105,8 +100,10 @@ else:
 class AkismetError(Exception):
     """Base class for all akismet exceptions."""
 
+
 class APIKeyError(AkismetError):
     """Invalid API key."""
+
 
 class Akismet(object):
     """A class for working with the akismet API"""
@@ -128,8 +125,8 @@ class Akismet(object):
         This comprises of api key plus the baseurl.
         """
         return 'http://%s.%s' % (self.key, self.baseurl)
-    
-    
+
+
     def _safeRequest(self, url, data, headers):
         try:
             resp = _fetch_url(url, data, headers)
@@ -151,7 +148,7 @@ class Akismet(object):
         """
         if key is None and isfile('apikey.txt'):
             the_file = [l.strip() for l in open('apikey.txt').readlines()
-                if l.strip() and not l.strip().startswith('#')]
+                        if l.strip() and not l.strip().startswith('#')]
             try:
                 self.key = the_file[0]
                 self.blog_url = the_file[1]
@@ -179,12 +176,12 @@ class Akismet(object):
         """
         if self.key is None:
             raise APIKeyError("Your have not set an API key.")
-        data = { 'key': self.key, 'blog': self.blog_url }
+        data = {'key': self.key, 'blog': self.blog_url}
         # this function *doesn't* use the key as part of the URL
         url = 'http://%sverify-key' % self.baseurl
         # we *don't* trap the error here
         # so if akismet is down it will raise an HTTPError or URLError
-        headers = {'User-Agent' : self.user_agent}
+        headers = {'User-Agent': self.user_agent}
         resp = self._safeRequest(url, urlencode(data), headers)
         if resp.lower() == 'valid':
             return True
@@ -226,9 +223,9 @@ class Akismet(object):
         data.setdefault('SERVER_NAME', os.environ.get('SERVER_NAME', ''))
         data.setdefault('SERVER_PORT', os.environ.get('SERVER_PORT', ''))
         data.setdefault('SERVER_SIGNATURE', os.environ.get('SERVER_SIGNATURE',
-            ''))
+                                                           ''))
         data.setdefault('SERVER_SOFTWARE', os.environ.get('SERVER_SOFTWARE',
-            ''))
+                                                          ''))
         data.setdefault('HTTP_ACCEPT', os.environ.get('HTTP_ACCEPT', ''))
         data.setdefault('blog', self.blog_url)
 
@@ -316,7 +313,7 @@ class Akismet(object):
         url = '%scomment-check' % self._getURL()
         # we *don't* trap the error here
         # so if akismet is down it will raise an HTTPError or URLError
-        headers = {'User-Agent' : self.user_agent}
+        headers = {'User-Agent': self.user_agent}
         # urlencode() chokes on non-ASCII input unless doseq= is set (2.6).
         # None of our values should be sequences, so it shouldn't matter.
         resp = self._safeRequest(url, urlencode(data, doseq=True), headers)
@@ -349,7 +346,7 @@ class Akismet(object):
         url = '%ssubmit-spam' % self._getURL()
         # we *don't* trap the error here
         # so if akismet is down it will raise an HTTPError or URLError
-        headers = {'User-Agent' : self.user_agent}
+        headers = {'User-Agent': self.user_agent}
         self._safeRequest(url, urlencode(data, doseq=True), headers)
 
 
@@ -370,6 +367,6 @@ class Akismet(object):
         url = '%ssubmit-ham' % self._getURL()
         # we *don't* trap the error here
         # so if akismet is down it will raise an HTTPError or URLError
-        headers = {'User-Agent' : self.user_agent}
+        headers = {'User-Agent': self.user_agent}
         self._safeRequest(url, urlencode(data, doseq=True), headers)
 
