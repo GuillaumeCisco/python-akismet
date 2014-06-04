@@ -12,4 +12,4 @@ setup(name='akismet',
       author_email='michael@voidspace.org.uk',
       url='http://www.voidspace.org.uk/python/modules.shtml#akismet',
       py_modules=['akismet'],
-     )
+)
